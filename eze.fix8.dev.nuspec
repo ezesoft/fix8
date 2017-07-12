@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>eze.fix8.dev</id>
+    <version>$version$</version>
+    <title>Eze FIX8 library (development)</title>
+    <authors>Fix8</authors>
+    <owners>Fix8, Sergey Sedreev</owners>
+    <licenseUrl>https://www.gnu.org/licenses/lgpl.html</licenseUrl>
+    <projectUrl>http://fix8.org/</projectUrl>
+    <iconUrl>https://www.gnu.org/licenses/lgpl.html</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Develop branch of FIX8 libraries</description>
+    <summary>Prebuilt FIX8 library (develoment branch)</summary>
+    <releaseNotes />
+    <copyright>Copyright 2013-2014</copyright>
+    <tags>FIX8 native CoApp v1.5.0 nativepackage</tags>
+    <dependencies>
+      <dependency id="fix8.dependencies.getopt" version="1.0.20151130.1" />
+      <dependency id="fix8.dependencies.openssl" version="1.0.20151130.1" />
+      <dependency id="fix8.dependencies.poco" version="1.6.20151130.1" />
+      <dependency id="fix8.dependencies.tbb" version="4.4.20151130.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="include\**\*.*" target="build\native\include\" />
+    <file src="doc\**\*.*" target="build\native\docs\" />
+    <file src="schema\**\*.*" target="build\native\docs\" />
+    <file src="msvc\x64\bin\Release\f8c.exe" target="build\native\bin\x64\v120\Release\Desktop\" />
+    <file src="msvc\x64\bin\Release\fix8.dll" target="build\native\bin\x64\v120\Release\Desktop\" />
+    <file src="msvc\x64\bin\Release\fix8.pdb" target="build\native\bin\x64\v120\Release\Desktop\" />
+    <file src="msvc\x64\bin\Release\seqedit.exe" target="build\native\bin\x64\v120\Release\Desktop\" />
+    <file src="msvc\x64\bin\Release\fix8.lib" target="build\native\lib\x64\v120\Release\Desktop\" />
+    <file src="msvc\Win32\bin\Release\f8c.exe" target="build\native\bin\Win32\v120\Release\Desktop\" />
+    <file src="msvc\Win32\bin\Release\fix8.dll" target="build\native\bin\Win32\v120\Release\Desktop\" />
+    <file src="msvc\Win32\bin\Release\fix8.pdb" target="build\native\bin\Win32\v120\Release\Desktop\" />
+    <file src="msvc\Win32\bin\Release\seqedit.exe" target="build\native\bin\Win32\v120\Release\Desktop\" />
+    <file src="msvc\Win32\bin\Release\fix8.lib" target="build\native\lib\Win32\v120\Release\Desktop\" />
+    <file src="msvc\x64\bin\Debug\f8cd.exe" target="build\native\bin\x64\v120\Debug\Desktop\" />
+    <file src="msvc\x64\bin\Debug\fix8d.dll" target="build\native\bin\x64\v120\Debug\Desktop\" />
+    <file src="msvc\x64\bin\Debug\fix8d.pdb" target="build\native\bin\x64\v120\Debug\Desktop\" />
+    <file src="msvc\x64\bin\Debug\seqeditd.exe" target="build\native\bin\x64\v120\Debug\Desktop\" />
+    <file src="msvc\x64\bin\Debug\fix8d.lib" target="build\native\lib\x64\v120\Debug\Desktop\" />
+    <file src="msvc\Win32\bin\Debug\f8cd.exe" target="build\native\bin\Win32\v120\Debug\Desktop\" />
+    <file src="msvc\Win32\bin\Debug\fix8d.dll" target="build\native\bin\Win32\v120\Debug\Desktop\" />
+    <file src="msvc\Win32\bin\Debug\fix8d.pdb" target="build\native\bin\Win32\v120\Debug\Desktop\" />
+    <file src="msvc\Win32\bin\Debug\seqeditd.exe" target="build\native\bin\Win32\v120\Debug\Desktop\" />
+    <file src="msvc\Win32\bin\Debug\fix8d.lib" target="build\native\lib\Win32\v120\Debug\Desktop\" />
+    <file src="NugetPackage\configurations.autopkg" target="build\" />
+    <file src="NugetPackage\publisher-info.txt" target="build\" />
+    <file src="NugetPackage\default-propertiesui.xml" target="build\native\" />
+    <file src="NugetPackage\eze.fix8.dev.props" target="build\native\" />
+    <file src="NugetPackage\eze.fix8.dev.targets" target="build\native\" />
+    <file src="NugetPackage\CoApp.NuGetNativeMSBuildTasks.dll.orig" target="build\native\private\" />
+  </files>
+</package>
