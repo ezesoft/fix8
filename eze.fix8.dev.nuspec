@@ -3,7 +3,7 @@
   <metadata>
     <id>eze.fix8.dev</id>
     <version>$version$</version>
-    <title>Eze FIX8 library (development)</title>
+    <title>Eze FIX8 library (dev)</title>
     <authors>Fix8</authors>
     <owners>Fix8, Sergey Sedreev</owners>
     <licenseUrl>https://www.gnu.org/licenses/lgpl.html</licenseUrl>
