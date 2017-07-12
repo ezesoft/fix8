@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>eze.fix8.dev</id>
+    <id>ezesoft.fix8.dev</id>
     <version>$version$</version>
     <title>Eze FIX8 library (dev)</title>
     <authors>Fix8</authors>
@@ -49,8 +49,8 @@
     <file src="NugetPackage\configurations.autopkg" target="build\" />
     <file src="NugetPackage\publisher-info.txt" target="build\" />
     <file src="NugetPackage\default-propertiesui.xml" target="build\native\" />
-    <file src="NugetPackage\eze.fix8.dev.props" target="build\native\" />
-    <file src="NugetPackage\eze.fix8.dev.targets" target="build\native\" />
+    <file src="NugetPackage\ezesoft.fix8.dev.props" target="build\native\" />
+    <file src="NugetPackage\ezesoft.fix8.dev.targets" target="build\native\" />
     <file src="NugetPackage\CoApp.NuGetNativeMSBuildTasks.dll.orig" target="build\native\private\" />
   </files>
 </package>
