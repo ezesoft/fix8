@@ -13,7 +13,7 @@
     <description>Develop branch of FIX8 libraries</description>
     <summary>Prebuilt FIX8 library (develoment branch)</summary>
     <releaseNotes />
-    <copyright>Copyright 2013-2014</copyright>
+    <copyright>Copyright 2013-2017</copyright>
     <tags>FIX8 native CoApp v1.5.0 nativepackage</tags>
     <dependencies>
       <dependency id="fix8.dependencies.getopt" version="1.0.20151130.1" />
