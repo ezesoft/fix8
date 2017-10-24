@@ -193,7 +193,7 @@ namespace defaults
 		connect_timeout=10,
 		log_rotation=5,
 		verification_depth=9,
-		log_maxsize=50,
+		log_maxsize=5000,
 	};
 }
 

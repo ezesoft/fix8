@@ -171,7 +171,7 @@ public:
 	static const int StdFlags = (1<<sequence|1<<thread|1<<timestamp|1<<level|1<<location);
 #endif
 	static const int rotation_default = 10, max_rotation = 1024;
-	static const unsigned maxfsz_default = 50;
+	static const unsigned maxfsz_default = 5000;
 	using LogFlags = ebitset<Flags>;
 	using Levels = ebitset<Level>;
 	using LogPositions = std::vector<int>;
