@@ -190,9 +190,10 @@ void Logger::process_logline(LogElement *msg_ptr)
 		else
 			get_stream() << endl;
 
-		auto sz = get_stream().tellp();
-		if (sz > _maxfszbytes)
-			rotate();
+		// TODO: uncomment when ready to implement
+		//auto sz = get_stream().tellp();
+		//if (sz > _maxfszbytes)
+		//	rotate();
 	}
 }
 
