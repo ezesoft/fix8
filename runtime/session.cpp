@@ -816,8 +816,11 @@ bool Session::heartbeat_service()
 		Tickval now(true);
 		if ((now - _last_sent).secs() >= static_cast<time_t>(_connection->get_hb_interval()))
 		{
-			const f8String testReqID;
-			send(generate_heartbeat(testReqID));
+			if (_state != States::st_test_request_sent)
+			{
+				const f8String testReqID;
+				send(generate_heartbeat(testReqID));
+			}
 		}
 
 		now.now();
@@ -825,7 +828,7 @@ bool Session::heartbeat_service()
 		{
 			if (_state != States::st_session_terminated)
 			{
-				if (_state == States::st_test_request_sent && (now - _last_sent).secs() <= static_cast<time_t>(_connection->get_hb_interval20pc()))
+				if (_state == States::st_test_request_sent && (now - _last_sent).secs() <= static_cast<time_t>(_connection->get_hb_interval()))
 				{
 					return true;
 				}
