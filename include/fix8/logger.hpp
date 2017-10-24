@@ -230,6 +230,8 @@ protected:
 
 	LogPositions _positions;
 
+	int _maxszinbytes;
+
 public:
 	/*! Ctor.
 	    \param flags ebitset flags
@@ -237,7 +239,7 @@ public:
 	    \param delim field delimiter
 	    \param positions field positions */
 	Logger(const LogFlags flags, const Levels levels=Levels(All), const std::string delim=" ", const LogPositions positions=LogPositions())
-		: _thread(std::ref(*this)), _flags(flags), _levels(levels), _delim(delim), _positions(positions)
+		: _thread(std::ref(*this)), _flags(flags), _levels(levels), _delim(delim), _positions(positions), _maxszinbytes(500000)
 	{
 		if (_positions.empty()) // setup default order
 		{

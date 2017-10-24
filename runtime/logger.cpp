@@ -189,6 +189,12 @@ void Logger::process_logline(LogElement *msg_ptr)
 			get_stream().flush();
 		else
 			get_stream() << endl;
+
+		auto size_in_bytes = get_stream().tellp();
+		if (size_in_bytes > _maxszinbytes)
+		{
+			rotate();
+		}
 	}
 }
 
