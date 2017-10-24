@@ -823,30 +823,13 @@ bool Session::heartbeat_service()
 		now.now();
 		if ((now - _last_received).secs() > static_cast<time_t>(_connection->get_hb_interval20pc()))
 		{
-			//if (_state == States::st_test_request_sent)	// already sent
-			//{
-			//	ostringstream ostr;
-			//	ostr << "Remote has ignored my test request. Aborting session...";
-			//	send(generate_logout(_loginParameters._silent_disconnect ? 0 : ostr.str().c_str()), true, 0, true); // so it won't increment
-			//	do_state_change(States::st_logoff_sent);
-			//	log(ostr.str(), Logger::Error);
-			//	try
-			//	{
-			//		stop();
-			//	}
-			//	catch (Poco::Net::NetException& e)
-			//	{
-			//		slout_error << e.what();
-			//	}
-			//	catch (exception& e)
-			//	{
-			//		slout_error << e.what();
-			//	}
-			//	return true;
-			//}
-			//else
 			if (_state != States::st_session_terminated)
 			{
+				if (_state == States::st_test_request_sent && (now - _last_sent).secs() <= static_cast<time_t>(_connection->get_hb_interval20pc()))
+				{
+					return true;
+				}
+
 				ostringstream ostr;
 				ostr << "Have not received anything from remote for ";
 				if (_last_received.secs())

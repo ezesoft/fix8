@@ -192,7 +192,8 @@ namespace defaults
 		hb_interval=30,
 		connect_timeout=10,
 		log_rotation=5,
-		verification_depth=9
+		verification_depth=9,
+		log_maxsize=50,
 	};
 }
 

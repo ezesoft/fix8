@@ -343,6 +343,15 @@ public:
 	unsigned get_logfile_rotation(const XmlElement *from, const unsigned def=defaults::log_rotation) const
 		{ return find_or_default(from, "rotation", def); }
 
+	/*! Extract the logfile max size.
+	\param from xml entity to search
+	\param def default value if not found
+	\return the logfile max size in kb value or 50 if not found */
+	unsigned get_logfile_maxsize(const XmlElement *from, const unsigned def=defaults::log_maxsize) const
+	{
+		return find_or_default(from, "maxsize", def);
+	}
+
 	/*! Extract the heartbeat interval from a session entity.
 	  \param from xml entity to search
 	  \param def default value if not found

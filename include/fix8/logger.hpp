@@ -171,6 +171,7 @@ public:
 	static const int StdFlags = (1<<sequence|1<<thread|1<<timestamp|1<<level|1<<location);
 #endif
 	static const int rotation_default = 5, max_rotation = 1024;
+	static const unsigned maxfsz_default = 50;
 	using LogFlags = ebitset<Flags>;
 	using Levels = ebitset<Level>;
 	using LogPositions = std::vector<int>;
@@ -230,7 +231,7 @@ protected:
 
 	LogPositions _positions;
 
-	int _maxszinbytes;
+	unsigned _maxfszbytes;
 
 public:
 	/*! Ctor.
@@ -238,8 +239,8 @@ public:
 	    \param levels ebitset levels
 	    \param delim field delimiter
 	    \param positions field positions */
-	Logger(const LogFlags flags, const Levels levels=Levels(All), const std::string delim=" ", const LogPositions positions=LogPositions())
-		: _thread(std::ref(*this)), _flags(flags), _levels(levels), _delim(delim), _positions(positions), _maxszinbytes(500000)
+	Logger(const LogFlags flags, const Levels levels=Levels(All), const std::string delim=" ", const LogPositions positions=LogPositions(), const unsigned maxfsz=maxfsz_default)
+		: _thread(std::ref(*this)), _flags(flags), _levels(levels), _delim(delim), _positions(positions), _maxfszbytes(maxfsz*1000)
 	{
 		if (_positions.empty()) // setup default order
 		{
@@ -282,6 +283,10 @@ public:
 		f8_scoped_spin_lock guard(_log_spl);
 		_positions = positions;
 	}
+
+	/*! Set the max file size
+	\param max file size in kb value to set */
+	void set_maxsize(const unsigned maxfsz) { _maxfszbytes=maxfsz*1000; }
 
 	/*! Get the underlying stream object.
 	    \return the stream */
@@ -371,7 +376,7 @@ public:
 	    \param positions field positions
 	    \param rotnum number of logfile rotations to retain (default=5) */
 	F8API FileLogger(const std::string& pathname, const LogFlags flags, const Levels levels, const std::string delim=" ",
-		const LogPositions positions=LogPositions(), const unsigned rotnum=rotation_default);
+		const LogPositions positions=LogPositions(), const unsigned rotnum=rotation_default, const unsigned maxfsz=maxfsz_default);
 
 	/// Dtor.
 	virtual ~FileLogger() {}
@@ -427,7 +432,7 @@ public:
 	    \param delim field delimiter
 	    \param positions field positions */
 	PipeLogger(const std::string& command, const LogFlags flags, const Levels levels, const std::string delim=" ",
-		LogPositions positions=LogPositions());
+		LogPositions positions=LogPositions(), const unsigned maxfsz=maxfsz_default);
 
 	/// Dtor.
 	virtual ~PipeLogger() {}
@@ -447,7 +452,7 @@ public:
 	    \param delim field delimiter
 	    \param positions field positions */
 	BCLogger(Poco::Net::DatagramSocket *sock, const LogFlags flags, const Levels levels, const std::string delim=" ",
-		LogPositions positions=LogPositions());
+		LogPositions positions=LogPositions(), const unsigned maxfsz=maxfsz_default);
 
 	/*! Ctor.
 	    \param ip ip string
@@ -457,7 +462,7 @@ public:
 	    \param delim field delimiter
 	    \param positions field positions */
 	BCLogger(const std::string& ip, const unsigned port, const LogFlags flags, const Levels levels,
-		const std::string delim=" ", LogPositions positions=LogPositions());
+		const std::string delim=" ", LogPositions positions=LogPositions(), const unsigned maxfsz=maxfsz_default);
 
 	/*! Check to see if a socket was successfully created.
 	  \return non-zero if ok, 0 if not ok */
@@ -530,6 +535,10 @@ public:
 	/*! Set the log positions
 	  \param positions positions to set */
 	static void set_positions(Logger::LogPositions positions) { instance().set_positions(positions); }
+
+	/*! Set the log positions
+	\param positions positions to set */
+	static void set_maxsize(const unsigned maxfsz) { instance().set_maxsize(maxfsz); }
 
 	/*! Stop the logger */
 	static void stop() { instance().stop(); }

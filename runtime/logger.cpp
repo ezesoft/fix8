@@ -190,11 +190,9 @@ void Logger::process_logline(LogElement *msg_ptr)
 		else
 			get_stream() << endl;
 
-		auto size_in_bytes = get_stream().tellp();
-		if (size_in_bytes > _maxszinbytes)
-		{
+		auto sz = get_stream().tellp();
+		if (sz > _maxfszbytes)
 			rotate();
-		}
 	}
 }
 
@@ -259,8 +257,8 @@ char Logger::get_thread_code(thread_id_t tid)
 
 //-------------------------------------------------------------------------------------------------
 FileLogger::FileLogger(const string& fname, const LogFlags flags, const Levels levels,
-	const std::string delim, const LogPositions positions, const unsigned rotnum)
-	: Logger(flags, levels, delim, positions), _rotnum(rotnum)
+	const std::string delim, const LogPositions positions, const unsigned rotnum, const unsigned maxfsz)
+	: Logger(flags, levels, delim, positions, maxfsz), _rotnum(rotnum)
 {
    if (!fname.empty())
    {
@@ -319,8 +317,8 @@ bool FileLogger::rotate(bool force)
 
 //-------------------------------------------------------------------------------------------------
 PipeLogger::PipeLogger(const string& fname, const LogFlags flags, const Levels levels,
-	const std::string delim, const LogPositions positions)
-	: Logger(flags, levels, delim, positions)
+	const std::string delim, const LogPositions positions, const unsigned maxfsz)
+	: Logger(flags, levels, delim, positions, maxfsz)
 {
 	const string pathname(fname.substr(1));
 
@@ -345,16 +343,16 @@ PipeLogger::PipeLogger(const string& fname, const LogFlags flags, const Levels l
 //-------------------------------------------------------------------------------------------------
 // nc -lu 127.0.0.1 -p 51000
 BCLogger::BCLogger(Poco::Net::DatagramSocket *sock, const LogFlags flags, const Levels levels,
-	const std::string delim, const LogPositions positions)
-	: Logger(flags, levels, delim, positions), _init_ok(true)
+	const std::string delim, const LogPositions positions, const unsigned maxfsz)
+	: Logger(flags, levels, delim, positions, maxfsz), _init_ok(true)
 {
 	_ofs = new bcostream(sock);
 	_flags |= broadcast;
 }
 
 BCLogger::BCLogger(const string& ip, const unsigned port, const LogFlags flags, const Levels levels,
-	const std::string delim, const LogPositions positions)
-	: Logger(flags, levels, delim, positions), _init_ok()
+	const std::string delim, const LogPositions positions, const unsigned maxfsz)
+	: Logger(flags, levels, delim, positions, maxfsz), _init_ok()
 {
 	Poco::Net::IPAddress ipaddr;
 	if (Poco::Net::IPAddress::tryParse(ip, ipaddr)
