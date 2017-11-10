@@ -104,7 +104,7 @@ void SessionID::from_string(const f8String& from)
 //-------------------------------------------------------------------------------------------------
 Session::Session(const F8MetaCntx& ctx, const SessionID& sid, Persister *persist, Logger *logger, Logger *plogger) :
 _state(States::st_none),
-_ctx(ctx), _connection(), _req_next_send_seq(), _req_next_receive_seq(),
+_ctx(ctx), _connection(), _req_next_send_seq(), _req_next_receive_seq(), _hb_count_since_resend(),
 	_sid(sid), _sf(), _persist(persist), _logger(logger), _plogger(plogger),	// initiator
 	_timer(*this, 10), _hb_processor(&Session::heartbeat_service, true),
 	_session_scheduler(&Session::activation_service, true), _schedule()
@@ -131,7 +131,7 @@ _ctx(ctx), _connection(), _req_next_send_seq(), _req_next_receive_seq(),
 //-------------------------------------------------------------------------------------------------
 Session::Session(const F8MetaCntx& ctx, const sender_comp_id& sci, Persister *persist, Logger *logger, Logger *plogger) :
 _state(States::st_none),
-_ctx(ctx), _sci(sci), _connection(), _req_next_send_seq(), _req_next_receive_seq(),
+_ctx(ctx), _sci(sci), _connection(), _req_next_send_seq(), _req_next_receive_seq(), _hb_count_since_resend(),
 	_sf(), _persist(persist), _logger(logger), _plogger(plogger),	// acceptor
 	_timer(*this, 10), _hb_processor(&Session::heartbeat_service, true),
 	_session_scheduler(&Session::activation_service, true), _schedule()
@@ -145,6 +145,7 @@ void Session::atomic_init(States::SessionStates st)
 {
 	do_state_change(st);
 	_next_send_seq = _next_receive_seq = 1;
+	_hb_count_since_resend = 0;
 	_active = true;
 }
 
@@ -641,18 +642,25 @@ bool Session::handle_logout(const unsigned seqnum, const Message *msg)
 //-------------------------------------------------------------------------------------------------
 bool Session::handle_sequence_reset(const unsigned seqnum, const Message *msg)
 {
-	enforce(seqnum, msg);
-
 	new_seq_num nsn;
-	if (msg->get(nsn))
+	msg->get(nsn);
+	
+	slout_debug << "newseqnum = " << nsn() << ", _next_receive_seq = " << static_cast<unsigned>(_next_receive_seq) << " seqnum:" << seqnum;
+	if (nsn() >= static_cast<unsigned>(_next_receive_seq))
+		_next_receive_seq = nsn() - 1;
+	else
 	{
-		slout_debug << "newseqnum = " << nsn() << ", _next_receive_seq = " << _next_receive_seq << " seqnum:" << seqnum;
-		if (nsn() >= static_cast<int>(_next_receive_seq))
-			_next_receive_seq = nsn() - 1;
-		else if (nsn() < static_cast<int>(_next_receive_seq))
-			throw MsgSequenceTooLow(nsn(), _next_receive_seq);
-	}
+		gap_fill_flag gff;
+		msg->get(gff);
 
+		if (!gff()) {
+			ostringstream errstr;
+			errstr << "Message Sequence too low, received" << nsn() << " expected " << static_cast<unsigned>(_next_receive_seq);
+			slout_warn << errstr.str();
+			return send(generate_reject(seqnum, errstr.str().c_str(), msg->get_msgtype().c_str()));
+		}
+	}
+	
 	if (_state == States::st_resend_request_sent)
 		do_state_change(States::st_continuous);
 
@@ -692,7 +700,43 @@ bool Session::handle_resend_request(const unsigned seqnum, const Message *msg)
 			//cout << "got resend request:" << begin() << " to " << end() << endl;
 			do_state_change(States::st_resend_request_received);
 			//f8_scoped_spin_lock guard(_per_spl, _connection->get_pmodel() == pm_coro); // no no nanette!
-			_persist->get(begin(), end(), *this, &Session::retrans_callback);
+
+			map<unsigned, f8String> dict;
+			unsigned num_found = 0;
+			
+			{
+				// lock and pull all the messages local
+				f8_scoped_spin_lock guard(_per_spl);
+				num_found = _persist->get(begin(), end(), dict);
+			}
+
+			unsigned start(begin()), stop(end()), next_expected_seqnum(begin());
+			if (stop == 0) // all messages
+				stop = _next_send_seq - 1;
+
+			bool has_gap(false);
+			for (unsigned i = start; i <= stop; i++) {
+				auto item = dict.find(i);
+				if (item == dict.end()) {
+					has_gap = true;
+					continue;
+				}
+				
+				if (has_gap) {
+					send(generate_sequence_reset(i, true), true, next_expected_seqnum, true);
+					has_gap = false;
+				}
+
+				Message *msg(Message::factory(_ctx, item->second));
+				send(msg);
+				next_expected_seqnum = i + 1;
+			}
+
+			if (has_gap)
+				send(generate_sequence_reset(stop, true), true, next_expected_seqnum, true);
+
+			if (_state == States::st_resend_request_received)
+				do_state_change(States::st_continuous);
 		}
 	}
 	else
@@ -858,6 +902,7 @@ bool Session::handle_heartbeat(const unsigned seqnum, const Message *msg)
 
 	if (_state == States::st_test_request_sent)
 		do_state_change(States::st_continuous);
+	++_hb_count_since_resend;
 	return true;
 }
 
