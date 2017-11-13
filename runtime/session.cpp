@@ -710,7 +710,7 @@ bool Session::handle_resend_request(const unsigned seqnum, const Message *msg)
 				num_found = _persist->get(begin(), end(), dict);
 			}
 
-			unsigned start(begin()), stop(end()), next_expected_seqnum(begin());
+			unsigned start(begin()), stop(end()), next_expected_seqnum(begin()), last_resend_seqnum(0);
 			if (stop == 0) // all messages
 				stop = _next_send_seq - 1;
 
@@ -729,11 +729,12 @@ bool Session::handle_resend_request(const unsigned seqnum, const Message *msg)
 
 				Message *msg(Message::factory(_ctx, item->second));
 				send(msg);
+				last_resend_seqnum = item->first;
 				next_expected_seqnum = i + 1;
 			}
 
-			if (has_gap)
-				send(generate_sequence_reset(stop, true), true, next_expected_seqnum, true);
+			if (last_resend_seqnum < _next_send_seq)
+				send(generate_sequence_reset(_next_send_seq, true), true, next_expected_seqnum, true);
 
 			if (_state == States::st_resend_request_received)
 				do_state_change(States::st_continuous);
