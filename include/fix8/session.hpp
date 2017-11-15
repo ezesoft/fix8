@@ -842,7 +842,7 @@ public:
 
 	/*! Get the number of heartbeats since last resend
 		\return unsigned */
-	unsigned get_heartbeats_since_resend() const { return _hb_count_since_resend; }
+	unsigned get_heartbeats_counter() const { return _hb_count_since_resend; }
 
 	/*! Detach message passed to handle_application. Will set source to 0;
 	    Not thread safe and should never be called across threads. It should
