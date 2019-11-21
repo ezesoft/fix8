@@ -200,7 +200,11 @@ int Session::start(Connection *connection, bool wait, const unsigned send_seqnum
 		}
 
 		send(generate_logon(_connection->get_hb_interval(), davi));
-		do_state_change(States::st_logon_sent);
+		// guard against state change to login_recieved winning the race.
+		if (_state != States::st_continuous)
+		{
+			do_state_change(States::st_logon_sent);
+		}
 	}
 	else
 	{
